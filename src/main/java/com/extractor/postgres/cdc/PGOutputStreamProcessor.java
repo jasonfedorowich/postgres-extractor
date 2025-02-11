@@ -347,7 +347,7 @@ public class PGOutputStreamProcessor {
                 columnData.add(TupleData.ColumnData.builder().data(new Data.NullData(type)).column(column).build());
                 break;
             default:
-                throw new RuntimeException("Unsupported tuple type"); // todo change error message
+                throw new UnsupportedOperationException("Unsupported tuple type: " + type); // todo change error message
             }
         }
 

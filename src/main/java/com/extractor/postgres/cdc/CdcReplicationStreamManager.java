@@ -1,5 +1,6 @@
 package com.extractor.postgres.cdc;
 
+import com.extractor.exceptions.StreamStartException;
 import com.extractor.postgres.connection.PostgresConnectionManager;
 import com.extractor.postgres.connection.query.QueryExecutor;
 import com.extractor.postgres.message.process.MessageSubscriber;
@@ -74,15 +75,15 @@ public class CdcReplicationStreamManager {
 
             return new PgMessageStream(chainedLogicalStreamBuilder.start(), subscribers, connection, streamContext);
         } catch (SQLException e) {
-            // todo cleanup
             log.error("{}", e.toString());
-            throw new RuntimeException(e);
+            throw new StreamStartException("Error with starting stream", e);
         }
 
     }
 
     // todo add start position
     // todo write back to source db to release wal log
+    // todo add someway to persist wal lsn
     public PgMessageStream startStream() {
         return startStream(null);
     }

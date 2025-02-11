@@ -1,5 +1,6 @@
 package com.extractor.postgres.cdc;
 
+import com.extractor.exceptions.StreamReadException;
 import com.extractor.postgres.message.process.MessageSubscriber;
 import com.extractor.postgres.message.process.StreamMessageContext;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class PgMessageStream implements AutoCloseable{
                     log.error("Error in stream: {}", e.toString());
                     streamContext.setStreamError(e);
                     // todo change exeception
-                    throw new RuntimeException(e);
+                    throw new StreamReadException("Error reading stream", e);
                 }
             }
         });
