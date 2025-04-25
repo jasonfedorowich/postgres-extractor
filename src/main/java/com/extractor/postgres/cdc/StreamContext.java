@@ -2,10 +2,12 @@ package com.extractor.postgres.cdc;
 
 import com.extractor.postgres.message.process.MessageSubscriber;
 import lombok.Getter;
+import org.postgresql.replication.LogSequenceNumber;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class StreamContext {
 
@@ -13,10 +15,15 @@ public class StreamContext {
 
     private final AtomicBoolean streamInError = new AtomicBoolean(false);
 
+    private final AtomicReference<LogSequenceNumber> appliedLsn = new AtomicReference<>();
+
+    private final AtomicReference<LogSequenceNumber> flushedLsn = new AtomicReference<>();
+
+
     @Getter
     private final List<Throwable> errors = new LinkedList<>();
 
-    private PGOutputStreamProcessor pgOutputStreamProcessor;
+    private PgOutputStreamProcessor pgOutputStreamProcessor;
     private PgMessageStream pgMessageStream;
 
     public boolean startStream() {
@@ -44,7 +51,7 @@ public class StreamContext {
         return streamInError.get();
     }
 
-    void setProcessor(PGOutputStreamProcessor pgOutputStreamProcessor) {
+    void setProcessor(PgOutputStreamProcessor pgOutputStreamProcessor) {
         this.pgOutputStreamProcessor = pgOutputStreamProcessor;
     }
 
@@ -54,5 +61,17 @@ public class StreamContext {
 
     public void addStream(PgMessageStream pgMessageStream) {
         this.pgMessageStream = pgMessageStream;
+    }
+
+    public LogSequenceNumber getAppliedLsn(){
+        return this.appliedLsn.get();
+    }
+    public LogSequenceNumber getFlushedLsn(){
+        return this.flushedLsn.get();
+    }
+
+    public void setLsn(LogSequenceNumber appliedLsn, LogSequenceNumber flushedLsn) {
+        this.appliedLsn.set(appliedLsn);
+        this.flushedLsn.set(flushedLsn);
     }
 }

@@ -1,7 +1,6 @@
 package com.extractor.postgres.cdc;
 
 import com.extractor.postgres.message.process.StreamMessageContext;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,14 +35,17 @@ class PgMessageStreamTest {
     private StreamMessageContext streamMessageContext;
 
     @Mock
-    private PGOutputStreamProcessor pgOutputStreamProcessor;
+    private PgOutputStreamProcessor pgOutputStreamProcessor;
+
+    @Mock
+    private PgStreamFlusher pgStreamFlusher;
 
     public static StreamContext streamContext = new StreamContext();
 
     @BeforeEach
     void setUp() {
         pgMessageStream = new PgMessageStream(pgOutputStreamProcessor, pgReplicationStream, connection,
-                streamMessageContext, streamContext);
+                streamMessageContext, streamContext, pgStreamFlusher);
     }
 
     @Test

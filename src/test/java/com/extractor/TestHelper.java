@@ -1,6 +1,7 @@
 package com.extractor;
 
 import com.extractor.postgres.message.process.MessageSubscriber;
+import com.extractor.postgres.message.process.StreamMessageContext;
 import com.extractor.postgres.message.type.Message;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +19,7 @@ public class TestHelper {
         Map<Message, Integer> counter = new LinkedHashMap<>();
 
         @Override
-        public void receive(Message message) {
+        public void receive(Message message, StreamMessageContext streamMessageContext) {
             log.info("Message: {}", message);
             counter.put(message, counter.getOrDefault(message, 0) + 1);
         }

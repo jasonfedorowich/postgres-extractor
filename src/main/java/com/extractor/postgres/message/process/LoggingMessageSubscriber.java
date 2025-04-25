@@ -8,8 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 public class LoggingMessageSubscriber implements MessageSubscriber {
 
     @Override
-    public void receive(Message message) {
+    public void receive(Message message, StreamMessageContext streamMessageContext) {
         log.info("<< Message received: {}", message);
+        log.info("<< Message context: {}", streamMessageContext);
     }
 
 }

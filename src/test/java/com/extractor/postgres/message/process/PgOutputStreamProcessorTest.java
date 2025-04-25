@@ -1,6 +1,6 @@
 package com.extractor.postgres.message.process;
 
-import com.extractor.postgres.cdc.PGOutputStreamProcessor;
+import com.extractor.postgres.cdc.PgOutputStreamProcessor;
 import com.extractor.postgres.cdc.StreamContext;
 import com.extractor.postgres.message.type.Message;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class PGOutputStreamProcessorTest {
+class PgOutputStreamProcessorTest {
 
-    private PGOutputStreamProcessor pgOutputStreamProcessor;
+    private PgOutputStreamProcessor pgOutputStreamProcessor;
 
     @Mock
     private StreamMessageContext streamMessageContext;
@@ -32,7 +32,7 @@ class PGOutputStreamProcessorTest {
         {
             add(new MessageSubscriber() {
                 @Override
-                public void receive(Message message) {
+                public void receive(Message message, StreamMessageContext streamMessageContext) {
                     MESSAGES.add(message);
                 }
             });
@@ -41,7 +41,7 @@ class PGOutputStreamProcessorTest {
 
     @BeforeEach
     void setUp() {
-        pgOutputStreamProcessor = new PGOutputStreamProcessor(messageSubscriberList, streamMessageContext,
+        pgOutputStreamProcessor = new PgOutputStreamProcessor(messageSubscriberList, streamMessageContext,
                 streamContext);
         MESSAGES.clear();
     }

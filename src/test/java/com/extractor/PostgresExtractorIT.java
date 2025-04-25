@@ -23,8 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class PostgresExtractorIT {
@@ -85,19 +84,24 @@ public class PostgresExtractorIT {
                 .setPublicationName("pub_test12345678").setMessageSubscribers(List.of(collectionMessageSubscriber))
                 .setContext(streamContext).build();
 
-
+        var appliedSequenceBefore = streamContext.getAppliedLsn();
+        var flushedLsnBefore = streamContext.getFlushedLsn();
 
         Executors.newSingleThreadScheduledExecutor().schedule(()->{
             try {
+                log.info("Inserting data");
                 TestHelper.insertRandomDataIntoFilms(dataConnection);
-                log.info("Stopping stream");
-                streamContext.stopStream();
+
             } catch (SQLException e) {
                 log.error("Error inserting: {}", e.toString());
                 throw new RuntimeException(e);
             }
         }, 3000, TimeUnit.MILLISECONDS);
 
+        Executors.newSingleThreadScheduledExecutor().schedule(()->{
+            log.info("Stopping stream");
+            streamContext.stopStream();
+        }, 9000, TimeUnit.MILLISECONDS);
 
         var stream = cdcReplicationStreamer.startStream();
         stream.read();
@@ -106,6 +110,10 @@ public class PostgresExtractorIT {
         countDownLatch.await(20, TimeUnit.SECONDS);
         assertFalse(collectionMessageSubscriber.counter.isEmpty());
         log.info("Finished test!");
+        var appliedSequenceAfter = streamContext.getAppliedLsn();
+        var flushedLsnAfter = streamContext.getFlushedLsn();
+        assertNotEquals(appliedSequenceBefore, appliedSequenceAfter);
+        assertNotEquals(flushedLsnBefore, flushedLsnAfter);
 
     }
 

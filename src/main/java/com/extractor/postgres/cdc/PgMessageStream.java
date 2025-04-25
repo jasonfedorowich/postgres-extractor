@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor
 public class PgMessageStream implements AutoCloseable{
 
-    private final PGOutputStreamProcessor pgOutputStreamProcessor;
+    private final PgOutputStreamProcessor pgOutputStreamProcessor;
 
     private final PGReplicationStream pgReplicationStream;
 
@@ -26,16 +26,20 @@ public class PgMessageStream implements AutoCloseable{
     private final StreamMessageContext streamMessageContext;
 
     private final StreamContext streamContext;
+
+    private final PgStreamFlusher pgStreamFlusher;
+
     private ExecutorService executorService;
 
     public PgMessageStream(PGReplicationStream pgReplicationStream, List<MessageSubscriber> subscribers,
             Connection connection, StreamContext streamContext) {
         this.pgReplicationStream = pgReplicationStream;
         this.streamMessageContext = new StreamMessageContext();
-        this.pgOutputStreamProcessor = new PGOutputStreamProcessor(subscribers, streamMessageContext, streamContext);
+        this.pgOutputStreamProcessor = new PgOutputStreamProcessor(subscribers, streamMessageContext, streamContext);
         this.connection = connection;
         this.streamContext = streamContext;
         this.streamContext.addStream(this);
+        this.pgStreamFlusher = new PgStreamFlusher(pgReplicationStream, streamContext);
     }
 
     public void read() {
@@ -49,7 +53,10 @@ public class PgMessageStream implements AutoCloseable{
                     log.debug("Bytes read from stream: {}", bb);
                     if(bb == null) continue;
                     pgOutputStreamProcessor.process(bb);
-                    // todo why is not commiting?
+
+                    var appliedLsn = pgReplicationStream.getLastAppliedLSN();
+                    var flushedLsn = pgReplicationStream.getLastFlushedLSN();
+                    pgStreamFlusher.flush(appliedLsn, flushedLsn);
                     // bb.get
                     // if(bb != null)
                     // log.info("{}", (char)bb.get());

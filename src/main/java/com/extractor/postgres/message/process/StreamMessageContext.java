@@ -5,11 +5,13 @@ import com.extractor.postgres.message.type.impl.Relation;
 import com.extractor.postgres.message.type.impl.Transaction;
 import com.extractor.postgres.message.type.impl.DataType;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Getter
+@ToString
 public class StreamMessageContext {
 
     private Map<Integer, Relation> relations;

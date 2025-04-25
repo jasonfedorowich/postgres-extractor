@@ -1,6 +1,7 @@
 package com.extractor.postgres.cdc;
 
 import com.extractor.postgres.message.process.MessageSubscriber;
+import com.extractor.postgres.message.process.StreamMessageContext;
 import com.extractor.postgres.message.type.Message;
 import com.extractor.postgres.objects.pub.PGPublication;
 import com.extractor.postgres.objects.slots.PGLogicalReplicationSlot;
@@ -50,7 +51,7 @@ class CdcReplicationStreamManagerTest {
         {
             add(new MessageSubscriber() {
                 @Override
-                public void receive(Message message) {
+                public void receive(Message message, StreamMessageContext streamMessageContext) {
 
                 }
 

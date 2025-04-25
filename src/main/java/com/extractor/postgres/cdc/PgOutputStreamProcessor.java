@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-public class PGOutputStreamProcessor {
+public class PgOutputStreamProcessor {
 
     private final StreamMessageContext context;
 
     private final List<MessageSubscriber> subscribers;
 
-    public PGOutputStreamProcessor(List<MessageSubscriber> subscribers, StreamMessageContext streamMessageContext,
-            StreamContext streamContext) {
+    public PgOutputStreamProcessor(List<MessageSubscriber> subscribers, StreamMessageContext streamMessageContext,
+                                   StreamContext streamContext) {
         this.subscribers = Objects.requireNonNullElse(subscribers, new LinkedList<>());
         this.context = streamMessageContext;
         streamContext.setProcessor(this);
@@ -300,7 +300,7 @@ public class PGOutputStreamProcessor {
 
     private void publish(Message message) {
         for (MessageSubscriber subscriber : subscribers) {
-            subscriber.receive(message);
+            subscriber.receive(message, this.context);
         }
     }
 
